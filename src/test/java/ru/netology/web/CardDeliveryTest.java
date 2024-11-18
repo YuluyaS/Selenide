@@ -2,6 +2,7 @@ package ru.netology.web;
 
 import com.codeborne.selenide.Selenide;
 import com.codeborne.selenide.Selectors;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.Keys;
 
@@ -24,21 +25,27 @@ class CardDeliveryTest {
     void MakingCardApplicationDelivery() {
 
         Selenide.open( "http://localhost:9999/");
-        $("[data-test-id='city']").shouldBe(visible).click();
-        $("[data-test-id='city']").setValue("Саратов");
+        $("[placeholder='Город']").shouldBe(visible).click();
+        $("[placeholder='Город']").setValue("Саратов");
 
-        //String planningDate = generateDate(3, "dd.MM.yyyy");
-        //$$("[data-test-id='date']").filter(visible).first().sendKeys(Keys.chord(Keys.SHIFT,Keys.HOME),Keys.BACK_SPACE);
-        //$$("[data-test-id='date']").filter(visible).first().setValue(planningDate);
+        String planningDate = generateDate(3, "dd.MM.yyyy");
+        $("[placeholder='Дата встречи']").shouldBe(visible).click();
+        $("[placeholder='Дата встречи']").sendKeys(Keys.chord(Keys.SHIFT,Keys.HOME),Keys.BACK_SPACE);
+        $("[placeholder='Дата встречи']").setValue(planningDate);
 
-        //$("[data-test-id='name']").setValue("Святынина Юлия");
+        $("[name='name']").setValue("Святынина Юлия");
+        $("[name='phone']").setValue("+79272230350");
 
-        //$("[data-test-id='phone']").setValue("+79272230350");
+        $("[data-test-id='agreement']").click();
 
-        //$$("[data-test-id='agreement']").last().setValue("Я соглашаюсь с условиями обработки и использования моих персональных данных");
+        $$("button").find(exactText("Забронировать")).click();
+        $(Selectors.withText("Успешно")).shouldBe(visible, Duration.ofSeconds(15));
 
-        //$$("button").find(exactText("Забронировать")).click();
-        //$(Selectors.withText("Успешно")).shouldBe(visible, Duration.ofSeconds(15));
+        String expectedResponse = "Встреча успешно забронирована на "+planningDate;
+
+        $(".notification__content").shouldBe(visible);
+        String actualResponse = $(".notification__content").getText();
+        //System.out.println("actualResponse ="+actualResponse);
+        Assertions.assertEquals(expectedResponse, actualResponse);
     }
-
 }
