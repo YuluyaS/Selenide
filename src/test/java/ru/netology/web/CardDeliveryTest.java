@@ -24,7 +24,9 @@ class CardDeliveryTest {
     @Test
     void MakingCardApplicationDelivery() {
 
-        Selenide.open( "http://localhost:9999/");
+        //Selenide.open( "http://localhost:9999/");
+        Selenide.open("http://localhost:9999/");
+
         $("[placeholder='Город']").shouldBe(visible).click();
         $("[placeholder='Город']").setValue("Саратов");
 
@@ -47,5 +49,6 @@ class CardDeliveryTest {
         String actualResponse = $(".notification__content").getText();
         //System.out.println("actualResponse ="+actualResponse);
         Assertions.assertEquals(expectedResponse, actualResponse);
+
     }
 }
