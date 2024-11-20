@@ -1,5 +1,6 @@
 package ru.netology.web;
 
+import com.codeborne.selenide.Condition;
 import com.codeborne.selenide.Selenide;
 import com.codeborne.selenide.Selectors;
 import org.junit.jupiter.api.Assertions;
@@ -14,7 +15,7 @@ import static com.codeborne.selenide.Condition.exactText;
 import static com.codeborne.selenide.Condition.visible;
 import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.$$;
-import static org.openqa.selenium.remote.tracing.EventAttribute.setValue;
+
 
 class CardDeliveryTest {
     public String generateDate(int days, String pattern) {
@@ -22,33 +23,31 @@ class CardDeliveryTest {
     }
 
     @Test
-    void MakingCardApplicationDelivery() {
+    void makingCardApplicationDelivery() {
 
         //Selenide.open( "http://localhost:9999/");
         Selenide.open("http://localhost:9999/");
 
-        $("[placeholder='Город']").shouldBe(visible).click();
-        $("[placeholder='Город']").setValue("Саратов");
+        $("[data-test-id='city'] input").val("Саратов");
 
         String planningDate = generateDate(3, "dd.MM.yyyy");
-        $("[placeholder='Дата встречи']").shouldBe(visible).click();
-        $("[placeholder='Дата встречи']").sendKeys(Keys.chord(Keys.SHIFT,Keys.HOME),Keys.BACK_SPACE);
-        $("[placeholder='Дата встречи']").setValue(planningDate);
+        $("[data-test-id='date'] input").shouldBe(visible).click();
+        $("[data-test-id='date'] input").sendKeys(Keys.chord(Keys.SHIFT,Keys.HOME),Keys.BACK_SPACE);
 
-        $("[name='name']").setValue("Святынина Юлия");
-        $("[name='phone']").setValue("+79272230350");
+        $("[data-test-id='date'] input").val(planningDate);
+
+        $("[data-test-id='name'] input").val("Святынина Юлия");
+
+        $("[data-test-id='phone'] input").val("+79272230350");
 
         $("[data-test-id='agreement']").click();
 
         $$("button").find(exactText("Забронировать")).click();
-        $(Selectors.withText("Успешно")).shouldBe(visible, Duration.ofSeconds(15));
+        $(Selectors.withText("Успешно!")).shouldBe(visible, Duration.ofSeconds(15));
 
         String expectedResponse = "Встреча успешно забронирована на "+planningDate;
 
         $(".notification__content").shouldBe(visible);
-        String actualResponse = $(".notification__content").getText();
-        //System.out.println("actualResponse ="+actualResponse);
-        Assertions.assertEquals(expectedResponse, actualResponse);
-
+        $(".notification__content").shouldHave(exactText(expectedResponse));
     }
 }
